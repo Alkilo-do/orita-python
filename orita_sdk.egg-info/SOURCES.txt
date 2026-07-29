@@ -1,0 +1,10 @@
+README.md
+pyproject.toml
+orita/__init__.py
+orita/client.py
+orita/exceptions.py
+orita_sdk.egg-info/PKG-INFO
+orita_sdk.egg-info/SOURCES.txt
+orita_sdk.egg-info/dependency_links.txt
+orita_sdk.egg-info/requires.txt
+orita_sdk.egg-info/top_level.txt

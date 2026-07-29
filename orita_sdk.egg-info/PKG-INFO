@@ -1,3 +1,19 @@
+Metadata-Version: 2.4
+Name: orita-sdk
+Version: 0.2.0
+Summary: The scheduling infrastructure for AI agents — Python SDK
+License: MIT
+Project-URL: Homepage, https://orita.online/developers
+Project-URL: Repository, https://github.com/Alkilo-do/orita-python
+Project-URL: Documentation, https://orita.online/developers
+Keywords: scheduling,booking,ai-agents,api
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: requests>=2.28
+
 # orita-python
 
 [![PyPI version](https://img.shields.io/pypi/v/orita-sdk.svg)](https://pypi.org/project/orita-sdk/)
