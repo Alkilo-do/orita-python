@@ -29,7 +29,7 @@ from orita import OritaClient, OritaError
 
 # ── Orita client ──────────────────────────────────────────────────────────────
 
-orita = OritaClient(api_key=os.environ.get("ORITA_API_KEY", "orita_8512592d89fa1b1936adaa9a6e6847db"))
+orita = OritaClient(api_key=os.environ["ORITA_API_KEY"])
 PROVIDER_ID: str | None = os.environ.get("ORITA_PROVIDER_ID", None)
 
 # ── Tools ─────────────────────────────────────────────────────────────────────

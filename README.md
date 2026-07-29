@@ -392,6 +392,83 @@ def book_appointment(date_str: str, time_str: str, name: str, lastname: str, ema
 
 ---
 
+### LangGraph
+
+Build a full scheduling agent as a **LangGraph `StateGraph`** — with nodes for understanding the request, querying availability, and confirming the booking:
+
+```python
+from langgraph.graph import END, StateGraph
+from langgraph.graph.message import add_messages
+from langchain_core.tools import tool
+from langchain_openai import ChatOpenAI
+from orita import OritaClient
+from typing import Annotated, TypedDict
+import json, os
+
+orita = OritaClient(api_key=os.environ["ORITA_API_KEY"])
+
+@tool
+def check_slots(event_type_id: str, date_str: str) -> str:
+    """Get available appointment slots for a given date (YYYY-MM-DD)."""
+    slots = orita.slots(event_type_id=event_type_id, date=date_str)
+    return json.dumps({"slots": [{"label": s["label"], "value": s["value"]} for s in slots]})
+
+@tool
+def confirm_booking(event_type_id: str, date_str: str, time_str: str,
+                    client_name: str, client_lastname: str, client_email: str) -> str:
+    """Confirm and create an appointment booking."""
+    booking = orita.book(
+        event_type_id=event_type_id, date=date_str, time=time_str,
+        client_name=client_name, client_lastname=client_lastname, client_email=client_email,
+    )
+    return json.dumps({"booking_id": booking["id"], "status": booking["status"]})
+
+class AgentState(TypedDict):
+    messages: Annotated[list, add_messages]
+
+orita_tools = [check_slots, confirm_booking]
+tool_map = {t.name: t for t in orita_tools}
+
+llm = ChatOpenAI(model="gpt-4o", temperature=0).bind_tools(orita_tools)
+
+def understand_and_plan(state):
+    from langchain_core.messages import SystemMessage
+    messages = [SystemMessage(content="You are a scheduling assistant. Use tools to check slots and book appointments.")]
+    return {"messages": [llm.invoke(messages + state["messages"])]}
+
+def execute_tool(state):
+    from langchain_core.messages import ToolMessage
+    last = state["messages"][-1]
+    results = []
+    for call in last.tool_calls:
+        result = tool_map[call["name"]].invoke(call["args"])
+        results.append(ToolMessage(content=result, tool_call_id=call["id"], name=call["name"]))
+    return {"messages": results}
+
+def should_continue(state):
+    last = state["messages"][-1]
+    return "execute_tool" if getattr(last, "tool_calls", None) else END
+
+graph = StateGraph(AgentState)
+graph.add_node("understand", understand_and_plan)
+graph.add_node("execute_tool", execute_tool)
+graph.set_entry_point("understand")
+graph.add_conditional_edges("understand", should_continue, {"execute_tool": "execute_tool", END: END})
+graph.add_edge("execute_tool", "understand")
+app = graph.compile()
+
+# Run
+from langchain_core.messages import HumanMessage
+result = app.invoke({"messages": [HumanMessage(
+    content="Book me a slot next Monday at 10am. I'm Ana López, ana@example.com"
+)]})
+print(result["messages"][-1].content)
+```
+
+→ Full example with `find_providers`, retry logic, and multi-turn support: [`examples/langgraph_orita.py`](examples/langgraph_orita.py)
+
+---
+
 ### CrewAI
 
 ```python
