@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "orita-sdk"
-version = "0.2.0"
-description = "The scheduling infrastructure for AI agents — Python SDK"
+version = "0.5.0"
+description = "Provider resolution and booking infrastructure for AI applications — Python SDK"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
-keywords = ["scheduling", "booking", "ai-agents", "api"]
+keywords = ["provider-resolution", "provider-matching", "multi-provider-scheduling", "booking-api", "ai-agents", "mcp"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
